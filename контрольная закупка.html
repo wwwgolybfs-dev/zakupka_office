@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контрольная закупка: Оценка филиала</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #1a73e8;
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 2em;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            color: white;
+            font-weight: 500;
+        }
+        td {
+            background-color: #fff;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .instruction {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-left: 5px solid #1a73e8;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        button {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+        }
+        #rating {
+            font-size: 1.5em;
+            color: #27ae60;
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #e8f9ee;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .radio-group label {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .radio-group label:hover {
+            color: #1a73e8;
+        }
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        select:focus {
+            border-color: #1a73e8;
+        }
+        textarea {
+            width: 100%;
+            height: 60px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        textarea:focus {
+            border-color: #1a73e8;
+        }
+        .order-composition {
+            margin-bottom: 20px;
+        }
+        .order-composition textarea {
+            height: 120px;
+        }
+        #photo-section {
+            margin-bottom: 20px;
+        }
+        #photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        #photo-preview img {
+            max-width: 150px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        #photo-preview img:hover {
+            transform: scale(1.05);
+        }
+        /* Responsive adaptations */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            th, td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            .radio-group {
+                flex-direction: column;
+                gap: 5px;
+            }
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            #photo-preview img {
+                max-width: 100%;
+            }
+            .section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Контрольная закупка в офисе</h1>
+    <div class="instruction">
+        <h2>Цель: Выявление несоответствий стандартам компании</h2>
+        <p>Руководство по процессу контрольной закупки:</p>
+        <ol>
+            <li>Регистрируйте аккаунты на номера, неизвестные сотрудникам.</li>
+            <li>Оформите заказ на доставку из случайного филиала на произвольный адрес в зоне обслуживания.</li>
+            <li><strong>Ключевой аспект:</strong> Создайте заказ с онлайн-оплатой (оплата курьеру или на кассе при заказе через приложение невозможна).</li>
+            <li>После получения заказа менеджер доставки отслеживает курьера, связывается с ним и меняет адрес на офисный или рядом с офисом.</li>
+            <li>Сотрудники офиса принимают заказ (оплата уже произведена онлайн). Если использовались бонусы из приложения, проверьте их правильное применение.</li>
+            <li>Альтернатива: Оформите заказ и посетите филиал для обеда (при заказе на кассе оплата только картой или наличными, без бонусов из приложения).</li>
+        </ol>
+    </div>
+
+    <form id="evaluationForm">
+        <div class="section">
+            <h2>Оценка курьера</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Критерий</th>
+                        <th>Описание</th>
+                        <th>Да/Нет</th>
+                        <th>Комментарии/Что пошло не так?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Курьер в униформе</td>
+                        <td>Оценка внешнего вида и опрятности</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="courier1" value="yes"> Да</label>
+                                <label><input type="radio" name="courier1" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_courier1"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Заказ извлечен из термосумки</td>
+                        <td>Проверка выдачи заказа</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="courier2" value="yes"> Да</label>
+                                <label><input type="radio" name="courier2" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_courier2"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Вежливое взаимодействие</td>
+                        <td>По телефону или лично</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="courier4" value="yes"> Да</label>
+                                <label><input type="radio" name="courier4" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_courier4"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Проверка термосумки</td>
+                        <td>Чистота внутри и снаружи</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="courier5" value="yes"> Да</label>
+                                <label><input type="radio" name="courier5" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_courier5"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Получение заказа с филиала</td>
+                        <td>Забрал в термосумке и т.д.</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="courier6" value="yes"> Да</label>
+                                <label><input type="radio" name="courier6" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_courier6"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Своевременное обновление статусов</td>
+                        <td>Заказ принят, забран, доставлен</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="courier7" value="yes"> Да</label>
+                                <label><input type="radio" name="courier7" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_courier7"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Оценка заказа и кассира</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Критерий</th>
+                        <th>Описание</th>
+                        <th>Да/Нет</th>
+                        <th>Комментарии/Что пошло не так?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Статусы заказа</td>
+                        <td>Принят, готовится, приготовлен</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order1" value="yes"> Да</label>
+                                <label><input type="radio" name="order1" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order1"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Действия при позиции в стоп-листе</td>
+                        <td>Позвонил, передал менеджеру, предложил замену</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order2" value="yes"> Да</label>
+                                <label><input type="radio" name="order2" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order2"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Сборка заказа</td>
+                        <td>Качество сборки</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order3" value="yes"> Да</label>
+                                <label><input type="radio" name="order3" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order3"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Правильная укладка упаковки</td>
+                        <td>Коробки, супницы и т.д.</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order4" value="yes"> Да</label>
+                                <label><input type="radio" name="order4" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order4"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Правильное соседство продуктов</td>
+                        <td>Холодное отдельно от горячего</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order5" value="yes"> Да</label>
+                                <label><input type="radio" name="order5" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order5"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Отсутствие брака</td>
+                        <td>Порванные пакеты и т.д.</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order6" value="yes"> Да</label>
+                                <label><input type="radio" name="order6" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order6"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Состав заказа соответствует</td>
+                        <td>Всё положено, без довоза</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order7" value="yes"> Да</label>
+                                <label><input type="radio" name="order7" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order7"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Коробки подписаны</td>
+                        <td>Маркировка коробок</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order8" value="yes"> Да</label>
+                                <label><input type="radio" name="order8" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order8"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Наличие чека</td>
+                        <td>Чек в заказе</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order9" value="yes"> Да</label>
+                                <label><input type="radio" name="order9" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order9"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Сервировка</td>
+                        <td>Качество сервировки</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order10" value="yes"> Да</label>
+                                <label><input type="radio" name="order10" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order10"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Все наклейки на месте</td>
+                        <td>Наклейки приклеены</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order11" value="yes"> Да</label>
+                                <label><input type="radio" name="order11" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order11"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Все приборы присутствуют</td>
+                        <td>Приборы в комплекте</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order12" value="yes"> Да</label>
+                                <label><input type="radio" name="order12" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order12"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Наличие подстаканника</td>
+                        <td>Подстаканник в заказе</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order13" value="yes"> Да</label>
+                                <label><input type="radio" name="order13" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order13"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Супницы в фасовке</td>
+                        <td>Упаковка супниц</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order14" value="yes"> Да</label>
+                                <label><input type="radio" name="order14" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order14"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Приборы соответствуют количеству персон</td>
+                        <td>Количество приборов</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order15" value="yes"> Да</label>
+                                <label><input type="radio" name="order15" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order15"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Учет комментария к заказу</td>
+                        <td>Если комментарий был</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order16" value="yes"> Да</label>
+                                <label><input type="radio" name="order16" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order16"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Правильное применение бонусов</td>
+                        <td>Бонусы применены корректно в приложении (если использовались; для заказов на кассе — не применимо)</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="order17" value="yes"> Да</label>
+                                <label><input type="radio" name="order17" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_order17"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Оценка блюд</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Критерий</th>
+                        <th>Описание</th>
+                        <th>Оценка</th>
+                        <th>Комментарии/Что пошло не так?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Температура блюд</td>
+                        <td>Оценка температуры</td>
+                        <td>
+                            <select name="dish1">
+                                <option value="">Выберите</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </td>
+                        <td><textarea name="comment_dish1"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Отсутствие посторонних предметов</td>
+                        <td>Нет лишнего в блюдах</td>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" name="dish2" value="yes"> Да</label>
+                                <label><input type="radio" name="dish2" value="no"> Нет</label>
+                            </div>
+                        </td>
+                        <td><textarea name="comment_dish2"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Правильный состав ингредиентов</td>
+                        <td>Соответствие рецепту</td>
+                        <td>
+                            <select name="dish3">
+                                <option value="">Выберите</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </td>
+                        <td><textarea name="comment_dish3"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Вес блюд</td>
+                        <td>Соответствие весу</td>
+                        <td>
+                            <select name="dish4">
+                                <option value="">Выберите</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </td>
+                        <td><textarea name="comment_dish4"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Вкус блюд</td>
+                        <td>Оценка вкуса</td>
+                        <td>
+                            <select name="dish5">
+                                <option value="">Выберите</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </td>
+                        <td><textarea name="comment_dish5"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Свежесть продуктов</td>
+                        <td>Продукты свежие</td>
+                        <td>
+                            <select name="dish6">
+                                <option value="">Выберите</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </td>
+                        <td><textarea name="comment_dish6"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Учет комментария к заказу (для блюд)</td>
+                        <td>Если комментарий был</td>
+                        <td>
+                            <select name="dish7">
+                                <option value="">Выберите</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </td>
+                        <td><textarea name="comment_dish7"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section order-composition">
+            <h2>Состав заказа</h2>
+            <textarea name="order_composition" placeholder="Укажите детали состава заказа (позиции, количества, комментарии и т.д.)">
+· 1× Рис с курицей и овощами – 408 P
+      Добавить ингредиенты
+        1× Курица
+· 1× Рис с курицей и овощами – 408 P
+      Добавить ингредиенты
+        1× Курица
+· 1× Малазийская хрустящая курица – 299 P
+· 1× Азиатский салат с курицей – 299 P
+      Дополнительно
+        1× - Кунжутный соус
+· 2× Приборы – Бесплатно
+            </textarea>
+        </div>
+
+        <div class="section" id="photo-section">
+            <h2>Загрузка фото</h2>
+            <input type="file" id="photo-input" multiple accept="image/*">
+            <div id="photo-preview"></div>
+        </div>
+
+        <button type="button" onclick="calculateRating()">Рассчитать рейтинг филиала</button>
+        <button type="button" onclick="exportToPDF()">Экспорт в PDF</button>
+    </form>
+
+    <div id="rating"></div>
+
+    <script>
+        let photos = []; // Массив для dataURL фото
+
+        document.getElementById('photo-input').addEventListener('change', function(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('photo-preview');
+            preview.innerHTML = '';
+            photos = [];
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                    photos.push(e.target.result); // Сохраняем dataURL
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function calculateRating() {
+            const form = document.getElementById('evaluationForm');
+            const radios = form.querySelectorAll('input[type="radio"]:checked');
+            const selects = form.querySelectorAll('select');
+
+            let courierScore = 0;
+            let courierMax = 0;
+            let totalScore = 0;
+            let totalMax = 0;
+
+            // Оценка курьера (вес 0.5), теперь 6 критериев
+            radios.forEach(radio => {
+                if (radio.name.startsWith('courier')) {
+                    courierMax += 0.5;
+                    totalMax += 0.5;
+                    if (radio.value === 'yes') {
+                        courierScore += 0.5;
+                        totalScore += 0.5;
+                    }
+                } else if (radio.name.startsWith('order') || (radio.name === 'dish2')) {
+                    totalMax += 1;
+                    if (radio.value === 'yes') {
+                        totalScore += 1;
+                    }
+                }
+            });
+
+            // Оценка блюд (шкала 1-5, кроме dish2)
+            selects.forEach(select => {
+                if (select.name.startsWith('dish') && select.name !== 'dish2' && select.value !== '') {
+                    const value = parseInt(select.value);
+                    totalMax += 1;
+                    totalScore += value / 5;
+                }
+            });
+
+            if (totalMax === 0) {
+                document.getElementById('rating').innerHTML = 'Рейтинг: Не все критерии оценены!';
+                return;
+            }
+
+            const courierRating = Math.round((courierScore / courierMax) * 5) || 0;
+            const overallRating = Math.round((totalScore / totalMax) * 5);
+            const finalCourier = Math.max(1, Math.min(5, courierRating));
+            const finalOverall = Math.max(1, Math.min(5, overallRating));
+
+            document.getElementById('rating').innerHTML = `Рейтинг курьера: ${finalCourier} из 5<br>Общий рейтинг филиала: ${finalOverall} из 5`;
+        }
+
+        function exportToPDF() {
+            // Собираем содержимое для pdfmake
+            const dd = {
+                content: [],
+                styles: {
+                    header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+                    subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
+                    table: { margin: [0, 5, 0, 15] }
+                },
+                defaultStyle: {
+                    font: 'Roboto' // Для кириллицы
+                }
+            };
+
+            // Заголовок
+            dd.content.push({ text: 'Отчет по контрольной закупке', style: 'header' });
+
+            // Состав заказа
+            const orderComp = document.querySelector('[name="order_composition"]').value || 'Не указан';
+            dd.content.push({ text: 'Состав заказа:', style: 'subheader' });
+            dd.content.push({ text: orderComp });
+
+            // Оценка курьера
+            dd.content.push({ text: 'Оценка курьера:', style: 'subheader' });
+            const courierTable = { table: { widths: ['*', '*', '*', '*'], body: [['Критерий', 'Описание', 'Да/Нет', 'Комментарии']] } };
+            const courierRows = document.querySelectorAll('.section:nth-child(1) tbody tr');
+            courierRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const crit = cells[0].textContent;
+                const desc = cells[1].textContent;
+                let val = row.querySelector('input:checked') ? row.querySelector('input:checked').value : 'Не оценено';
+                val = val === 'yes' ? 'Да' : (val === 'no' ? 'Нет' : val);
+                const comm = cells[3].querySelector('textarea').value || 'Нет';
+                courierTable.table.body.push([crit, desc, val, comm]);
+            });
+            dd.content.push(courierTable);
+
+            // Оценка заказа и кассира
+            dd.content.push({ text: 'Оценка заказа и кассира:', style: 'subheader' });
+            const orderTable = { table: { widths: ['*', '*', '*', '*'], body: [['Критерий', 'Описание', 'Да/Нет', 'Комментарии']] } };
+            const orderRows = document.querySelectorAll('.section:nth-child(2) tbody tr');
+            orderRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const crit = cells[0].textContent;
+                const desc = cells[1].textContent;
+                let val = row.querySelector('input:checked') ? row.querySelector('input:checked').value : 'Не оценено';
+                val = val === 'yes' ? 'Да' : (val === 'no' ? 'Нет' : val);
+                const comm = cells[3].querySelector('textarea').value || 'Нет';
+                orderTable.table.body.push([crit, desc, val, comm]);
+            });
+            dd.content.push(orderTable);
+
+            // Оценка блюд
+            dd.content.push({ text: 'Оценка блюд:', style: 'subheader' });
+            const dishTable = { table: { widths: ['*', '*', '*', '*'], body: [['Критерий', 'Описание', 'Оценка', 'Комментарии']] } };
+            const dishRows = document.querySelectorAll('.section:nth-child(3) tbody tr');
+            dishRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const crit = cells[0].textContent;
+                const desc = cells[1].textContent;
+                let val = 'Не оценено';
+                if (row.querySelector('select')) {
+                    val = row.querySelector('select').value || 'Не оценено';
+                } else if (row.querySelector('input:checked')) {
+                    val = row.querySelector('input:checked').value;
+                    val = val === 'yes' ? 'Да' : (val === 'no' ? 'Нет' : val);
+                }
+                const comm = cells[3].querySelector('textarea').value || 'Нет';
+                dishTable.table.body.push([crit, desc, val, comm]);
+            });
+            dd.content.push(dishTable);
+
+            // Фото
+            if (photos.length > 0) {
+                dd.content.push({ text: 'Загруженные фото:', style: 'subheader' });
+                photos.forEach((photo, index) => {
+                    dd.content.push({ image: photo, width: 150, margin: [0, 5, 0, 5] });
+                    dd.content.push({ text: `Фото ${index + 1}` });
+                });
+            }
+
+            // Рейтинги
+            const ratingText = document.getElementById('rating').innerText || 'Рейтинги не рассчитаны';
+            dd.content.push({ text: ratingText, style: 'subheader' });
+
+            // Генерация и скачивание PDF
+            pdfMake.createPdf(dd).download('kontrolnaya_zakupka.pdf');
+        }
+    </script>
+</body>
+</html>
