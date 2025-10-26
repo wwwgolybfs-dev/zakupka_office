@@ -650,29 +650,77 @@
             let totalScore = 0;
             let totalMax = 0;
 
-            // Оценка курьера (вес 0.5), теперь 6 критериев
+            const courierWeights = {
+                'courier1': 0.5,
+                'courier2': 0.5,
+                'courier4': 0.5,
+                'courier5': 0.5,
+                'courier6': 0.5,
+                'courier7': 0.5
+            };
+
+            const orderWeights = {
+                'order1': 1,
+                'order2': 1,
+                'order3': 1,
+                'order4': 1,
+                'order5': 1,
+                'order6': 1,
+                'order7': 2, // Высокий вес для соответствия состава заказа
+                'order8': 1,
+                'order9': 1,
+                'order10': 1,
+                'order11': 1,
+                'order12': 1,
+                'order13': 1,
+                'order14': 1,
+                'order15': 1,
+                'order16': 1,
+                'order17': 1
+            };
+
+            const dishWeights = {
+                'dish1': 1, // Температура
+                'dish2': 1, // Отсутствие посторонних
+                'dish3': 1, // Состав ингредиентов
+                'dish4': 1, // Вес
+                'dish5': 2, // Вкус, высокий вес
+                'dish6': 2, // Свежесть, высокий вес
+                'dish7': 1  // Учет комментария
+            };
+
+            // Обработка радио-кнопок (yes/no)
             radios.forEach(radio => {
-                if (radio.name.startsWith('courier')) {
-                    courierMax += 0.5;
-                    totalMax += 0.5;
-                    if (radio.value === 'yes') {
-                        courierScore += 0.5;
-                        totalScore += 0.5;
+                const name = radio.name;
+                let weight = 0;
+
+                if (name.startsWith('courier')) {
+                    weight = courierWeights[name] || 0.5;
+                    courierMax += weight;
+                } else if (name.startsWith('order')) {
+                    weight = orderWeights[name] || 1;
+                } else if (name.startsWith('dish')) {
+                    weight = dishWeights[name] || 1;
+                }
+
+                totalMax += weight;
+
+                if (radio.value === 'yes') {
+                    if (name.startsWith('courier')) {
+                        courierScore += weight;
                     }
-                } else if (radio.name.startsWith('order') || (radio.name === 'dish2')) {
-                    totalMax += 1;
-                    if (radio.value === 'yes') {
-                        totalScore += 1;
-                    }
+                    totalScore += weight;
                 }
             });
 
-            // Оценка блюд (шкала 1-5, кроме dish2)
+            // Обработка селектов (1-5)
             selects.forEach(select => {
                 if (select.name.startsWith('dish') && select.name !== 'dish2' && select.value !== '') {
+                    const name = select.name;
+                    const weight = dishWeights[name] || 1;
                     const value = parseInt(select.value);
-                    totalMax += 1;
-                    totalScore += value / 5;
+                    totalMax += weight;
+                    totalScore += (value / 5) * weight;
                 }
             });
 
