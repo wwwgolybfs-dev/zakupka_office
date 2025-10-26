@@ -681,12 +681,12 @@
                 return;
             }
 
-            const courierRating = Math.round((courierScore / courierMax) * 5) || 0;
-            const overallRating = Math.round((totalScore / totalMax) * 5);
-            const finalCourier = Math.max(1, Math.min(5, courierRating));
-            const finalOverall = Math.max(1, Math.min(5, overallRating));
+            const courierRating = Math.round((courierScore / courierMax) * 100) || 0;
+            const overallRating = Math.round((totalScore / totalMax) * 100);
+            const finalCourier = Math.max(1, Math.min(100, courierRating));
+            const finalOverall = Math.max(1, Math.min(100, overallRating));
 
-            document.getElementById('rating').innerHTML = `Рейтинг курьера: ${finalCourier} из 5<br>Общий рейтинг филиала: ${finalOverall} из 5`;
+            document.getElementById('rating').innerHTML = `Рейтинг курьера: ${finalCourier} из 100<br>Общий рейтинг филиала: ${finalOverall} из 100`;
         }
 
         function exportToPDF() {
